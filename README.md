@@ -1,12 +1,12 @@
 # Nilas
 
-A fibsemOS milling strategy plugin that extends [Adaptive Milling](https://github.com/rosalindfranklininstitute/adaptive_milling) with a configurable stage tilt, enabling adaptive polishing at low voltage and high tilt.
+A fibsemOS milling strategy plugin that extends [Adaptive Milling](https://github.com/rosalindfranklininstitute/adaptive_milling) with a configurable stage tilt and rotation, enabling adaptive polishing at low voltage and high tilt.
 
 ## What it does
 
-Nilas wraps the `AdaptivePolishing` strategy and adds one parameter: `stage_tilt_deg`. Before each polishing run, it tilts the stage to the specified angle, then restores the original tilt when milling finishes (including on failure).
+Nilas wraps the `AdaptivePolishing` strategy and adds two parameters: a stage tilt offset and a stage rotation offset. Before each polishing run, it moves the stage by those offsets (relative to where it currently is), then restores the original stage position when milling finishes (including on failure or cancellation).
 
-Everything else — the ML-driven thickness feedback, GIS stopping conditions, output plots — is inherited from `AdaptivePolishing` unchanged.
+Everything else — the ML-driven thickness feedback, GIS stopping conditions, output plots — is inherited from `AdaptivePolishing` unchanged. Milling voltage is set per stage as usual.
 
 ## Installation
 
@@ -22,9 +22,14 @@ In the AutoLamella protocol editor, add a Polishing stage and set its strategy t
 
 | Setting | Default | Description |
 |---|---|---|
-| `stage_tilt_deg` | `0.0` | Stage tilt angle in degrees applied before milling. Original tilt is restored afterwards. |
+| `stage_tilt_offset` | `0.0` | Degrees to tilt the stage, relative to its current tilt, before polishing. |
+| `stage_rotation_offset` | `0.0` | Degrees to rotate the stage, relative to its current rotation, before polishing. |
+
+With both offsets at `0`, Nilas behaves exactly like AdaptivePolishing and does not move the stage.
+
+**Note:** tilting or rotating after milling setup moves the lamella relative to the FIB patterns and alignment reference. Keep offsets small and work at eucentric height; large rotations will usually move the lamella out of the field of view.
 
 ## Requirements
 
 - Python ≥ 3.9
-- [adaptive-milling](https://github.com/rosalindfranklininstitute/adaptive_milling) ≥ 0.1.0 (which pulls in fibsem)
+- [adaptive-milling](https://github.com/rosalindfranklininstitute/adaptive_milling) ≥ 0.4.0 (which pulls in fibsem)
